@@ -1,3 +1,15 @@
+# **************************************************************************** #
+#                                                                              #
+#                                                   ::::::::::: ::::::::::     #
+#    rulertxt.sh                                       :+:     :+:             #
+#                                                     +:+     +:+              #
+#    By: Thinotsuki <thinotsukimichi@gmail.com>      +#+     :#::+::#          #
+#                                                   +#+     +#+                #
+#    Created: 2022/08/25 22:56:16 by Thinotsuki    #+#     #+#                 #
+#    Updated: 2022/08/25 22:56:18 by Thinotsuki   ###     ###.br               #
+#                                                                              #
+# **************************************************************************** #
+
 #!/bin/bash
 
 printf 'Para Adicionar efeito a um texto usando printf usa-se: (\e[{ef1};{ef2};{efn..}m)"texto\n"'
