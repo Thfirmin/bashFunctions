@@ -1,132 +1,224 @@
-#!/bin/bash
+# **************************************************************************** #
+#                                                                              #
+#                                                   ::::::::::: ::::::::::     #
+#    makemod.sh                                        :+:     :+:             #
+#                                                     +:+     +:+              #
+#    By: Thinotsuki <thinotsukimichi@gmail.com>      +#+     :#::+::#          #
+#                                                   +#+     +#+                #
+#    Created: 2022/08/25 22:55:39 by Thinotsuki    #+#     #+#                 #
+#    Updated: 2022/08/25 22:55:47 by Thinotsuki   ###     ###.br               #
+#                                                                              #
+# **************************************************************************** #
 
+# Function Makemod
+# Spawn a personalized initial molded Makefile with: text effects output suport, mandatory rules, functional folders and 42header.
+# Sensitive with a existing makefile with warning to delete and a ignoring exist Makefile mode.
 makemod()
 {
 
-	let LEN=78
-	STR=y
-	let ITERATIVE
-	let STD_FUNC
-	let	FOLDER
-	let ANSWER
-	let HELP
+        let LEN=80
+        STR=y
+        let ITERATIVE
+        STD_FUNC=0
+        let     FOLDER
+        let ANSWER
+        let HELP
+        let FORCE
+        TXTCD=0
 
-	function iterflag
-	{
-		FLAG=$2
-		ARGV=$1
-		LEN_ARGV=${#ARGV}
+        function iterateFlag
+        {
+                # Function Sponsor to check the flags gived and compare with the arguments gived in CLI to return 0 or 1.
+                FLAG=$2
+                ARGV=$1
+                LEN_ARGV=${#ARGV}
 
-		if [[ ${ARGV:0:1} == "-" ]]; then
-			for ((i = 1; i < $LEN_ARGV; i++)); do
-				if [[ ${ARGV:$i:1} == $FLAG ]]; then
-					return 1
-				fi
-			done
-		fi
-		return 0
-	}
+                if [[ ${ARGV:0:1} == "-" ]]; then
+                        for ((i = 1; i < $LEN_ARGV; i++)); do
+                                if [[ ${ARGV:$i:1} == $FLAG ]]; then
+                                        return 1
+                                fi
+                        done
+                fi
+                return 0
+        }
 
-	function middle
-	{
-    	STR_LEN=${#STR}
+        function putFolder
+        {
+                STR_LEN=${#STR}
 
-    	for ((i = 0; i < $LEN; i++)); do
-    	    if [[ $i == $(($((LEN / 2)) - $((STR_LEN / 2)))) ]]; then
-    	        echo -n $STR
-    	    else
-    	        echo -n " "
-    	    fi
-    	done
-    	echo ""
-	}
+                for ((i = 0; i < $LEN; i++)); do
+                        if [[ $i == 0 ]]; then
+                                echo -n "# +>" >> Makefile
+                        else
+                                if [[ $i == $(($((LEN / 2)) - $((STR_LEN / 2)))) ]]; then
+                                        echo -n $STR >> Makefile
+                                        echo -e " \n" >> Makefile
+                                        break
+                                else
+                                        echo -n " " >> Makefile
+                                fi
+                        fi
+                done
+        }
 
-	function stdFunctions
-	{
-		echo -e "all:\t\$(NAME)\n" >> Makefile
-		echo -e "\$(NAME):\n" >> Makefile
-		echo -e "clean:\n" >> Makefile
-		echo -e "fclean:\tclean\n" >> Makefile
-		echo -e "re:\t\tfclean all\n" >> Makefile
-		echo -en ".PHONY:\tall clean fclean re" >> Makefile
-	}
+        function txtCodes
+        {
+                echo -e "BLANK\t\t\t= \\\e[m" >> Makefile
+                echo -e "RED\t\t\t\t= \\\e[38;5;9m" >> Makefile
+                echo -e "YELLOW\t\t\t= \\\e[38;5;11m" >> Makefile
+                echo -e "GREEN\t\t\t= \\\e[38;5;2m" >> Makefile
+                echo -e "BLUE\t\t\t= \\\e[38;5;6m" >> Makefile
+                echo -e "PURPLE\t\t\t= \\\e[38;5;5m" >> Makefile
+                echo -e "PINK\t\t\t= \\\e[38;5;13m" >> Makefile
+                echo -e "WHITE\t\t\t= \\\e[38;5;15m\n" >> Makefile
+                echo -e "STRONG\t\t\t= \\\e[1m" >> Makefile
+                echo -e "SHADOW\t\t\t= \\\e[2m" >> Makefile
+                echo -e "ITALIC\t\t\t= \\\e[3m" >> Makefile
+                echo -e "UNDLINE\t\t\t= \\\e[4m" >> Makefile
+                echo -e "UPPLINE\t\t\t= \\\e[53m" >> Makefile
+                echo -e "DUNDLINE\t\t= \\\e[21m" >> Makefile
+                echo -e "CENSORED\t\t= \\\e[9m" >> Makefile
+                echo -e "UPALIGN\t\t\t= \\\e[73m" >> Makefile
+                echo -e "DWALIGN\t\t\t= \\\e[74m" >> Makefile
+                echo -e "FULLER\t\t\t= \\\e[7m" >> Makefile
+        }
 
-	function initMake
-	{
-		if [[ $STD_FUNC == 1 ]]; then
-			stdFunctions
-		fi
-		touch Makefile
-		vim -c Stdheader -c write Makefile
-	}
+        function stdFunctions
+        {
+                #function sponsor to put the mandatory functions for Makefiles
+                echo -e "all:\t\t\$(NAME)\n" >> Makefile
+                echo -e "\$(NAME):\n" >> Makefile
+                echo -e "clean:\n" >> Makefile
+                echo -e "fclean:\t\tclean\n" >> Makefile
+                echo -e "re:\t\t\tfclean all\n" >> Makefile
+                echo -en ".PHONY:\t\tall clean fclean re\n" >> Makefile
+        }
 
-	iterflag $1 i
-	ITERATIVE=$?
-	iterflag $1 s
-	STD_FUNC=$?
-	iterflag $1 f
-	FOLDER=$?
-	iterflag $1 h
-	HELP=$?
+        function initMake
+        {
+                if [[ $TXTCD != 0 ]]; then
+                        if [[ $FOLDER == 1 ]]; then
+                                STR=$TXTCD
+                                putFolder
+                                txtCodes
+                                echo -e "# <+-'-.-'-.-'-.-'-.-'-.-'-.-'-.-'-.-'-.-'-.-'-.-'-.-'-.-'-.-'-.-'-.-'-.-'-.-' #" >> Makefile
+                        else
+                                txtCodes
+                        fi
+                fi
+                if [[ $STD_FUNC != 0 ]]; then
+                        if [[ $FOLDER == 1 ]]; then
+                                STR=$STD_FUNC
+                                putFolder
+                                stdFunctions
+                                echo -e "# <+-'-.-'-.-'-.-'-.-'-.-'-.-'-.-'-.-'-.-'-.-'-.-'-.-'-.-'-.-'-.-'-.-'-.-'-.-' #" >> Makefile
+                        else
+                                stdFunctions
+                        fi
+                fi
+                touch Makefile
+                echo -e "# vim: fdm=marker fmr=+>,<+ ts=4 sw=4 nofen noet:" >> Makefile
+                vim -c Stdheader -c write Makefile
+        }
 
-	if [[ $HELP == 1 ]]; then
-		echo -e "|MAKEMOD|\nA Simple 42 adapted generator of makefile.\n\nCommands:"
-		echo -e "-h\tPrint the help of makemod"
-		echo -e "-i\tEnable the iterative mod"
-		echo -e "-f\tEnable the folder making mod"
-		echo -e "-s\tEnable standard Makefile functions"
-		echo -e "\nAll options're Desable for default"
-		echo -e "\n\nMakemod Function: Created by Thiago Firmino dos Santos (ツキミチチノ)"
-		return 0
-	fi
-	
-	if [ $(ls Makefile 2> /dev/null) ]; then
-		echo "There's already exist a Makefile, you want to Override the current Makefile? [Y\n]: "
-		read ANSWER
-		if [[ $ANSWER != "n" && $ANSWER != "N" ]]; then
-			rm -rf Makefile
-		else
-			return 1
-		fi	
-	fi
+        iterateFlag $1 i
+        ITERATIVE=$?
+        iterateFlag $1 s
+        STD_FUNC=$?
+        iterateFlag $1 f
+        FOLDER=$?
+        iterateFlag $1 h
+        HELP=$?
+        iterateFlag $1 y
+        FORCE=$?
+        iterateFlag $1 t
+        TXTCD=$?
 
-	if [[ $ITERATIVE == 1 ]]; then
-		echo -n "You Want to Put Folders in your MAkefile? [Y/n] "
-		read ANSWER
-		if [[ $ANSWER != "n" && $ANSWER != "N" ]]; then
-			FOLDER=1
-		else
-			FOLDER=0
-		fi
-		echo -n "You want to put the standarts functions of Makefile? [Y/n] "
-		read ANSWER
-		if [[ $ANSWER != "n" && $ANSWER != "N" ]]; then
-			STD_FUNC=1
-		else
-			STD_FUNC=0
-		fi
-	fi
-	
-	if [[ $FOLDER == 1 ]]; then
-		for ((; ;)); do
-			echo -n "Which folder do you want to insert? "
-			read STR
-			echo -en "# '-.-'-.-'-.-'-.-'-.-'-.-'-.-'-.-'-.-'-.-'-.-'-.-'-.-'-.-'-.-'-.-'-.-'-.-'-.-'#\n# " >> Makefile
-			middle
-			echo ""
-			echo -n "Do you want to put more folders? [Y/n] "
-			read ANSWER
-			if [[ $ANSWER != "n" && $ANSWER != "N" ]]; then
-				break
-			fi
-		done
-	fi
+        if [[ $HELP == 1 ]]; then
+                echo -e "|MAKEMOD|\nA Simple 42 adapted generator of makefile.\n\nCommands:"
+                echo -e "-h\tPrint the help of makemod"
+                echo -e "-i\tEnable the iterative mod"
+                echo -e "-f\tEnable the folder making mod"
+                echo -e "\t\tOpen a single folder: In [Normal Mode] press 'z'+'o'"
+                echo -e "\n\t\tClose a single folder: In [Normal Mode] press 'z'+'c'"
+                echo -e "\n\t\tOpen all son folder of a single folder: In [Normal Mode] press 'z'+'O'"
+                echo -e "\n\t\tClose all father folder of a single folder: In [Normal Mode] press 'z'+'C'"
+                echo -e "\n\t\tOpen all father folders in a file: In [Normal Mode] press 'z'+'r'"
+                echo -e "\n\t\tClose all father folders in a file: In [Normal Mode] press 'z'+'m'"
+                echo -e "\n\t\tOpen all folders in a file: In [Normal Mode] press 'z'+'R'"
+                echo -e "\n\t\tClose all folders in a file: In [Normal Mode] press 'z'+'M'\n"
+                echo -e "-s\tEnable standard Makefile functions"
+                echo -e "-y\tEnable enforce mod. (Delete a already existing Makefile without a prevous question)"
+                echo -e "-t\tEnable text effects shortcut to use with echo or printf"
+                echo -e "\nAll options're Desable for default"
+                echo -e "\n\nMakemod Function: Created by Thiago Firmino dos Santos"
+                return 0
+        fi
 
-	initMake
+        if [ -f Makefile ]; then
+                if [[ $FORCE == 1 ]];then
+                        ANSWER=1
+                else
+                        echo "There's already exist a Makefile, you want to Override the current Makefile? [Y\n]: "
+                        read ANSWER
+                fi
+                if [[ $ANSWER != "n" && $ANSWER != "N" ]]; then
+                        rm -rf Makefile
+                else
+                        return 1
+                fi
+        fi
 
-	return 0
+        if [[ $ITERATIVE == 1 ]]; then
+                echo -n "You Want to Put Folders in your Makefile? [Y/n] "
+                read ANSWER
+                if [[ $ANSWER != "n" && $ANSWER != "N" ]]; then
+                        FOLDER=1
+                fi
+                echo -n "You want to put the standarts functions of Makefile? [Y/n] "
+                read ANSWER
+                if [[ $ANSWER != "n" && $ANSWER != "N" ]]; then
+                        STD_FUNC=1
+                fi
+                echo -n "You want to put text effects on your Makefile? [Y/n] "
+                read ANSWER
+                if [[ $ANSWER != "n" && $ANSWER != "N" ]]; then
+                        TXTCD=1
+                fi
+        fi
+
+        if [[ $FOLDER == 1 ]]; then
+                if [[ $STD_FUNC == 1 ]]; then
+                        echo -n "Choose a name for the standard functions folder: "
+                        read STD_FUNC
+                fi
+                if [[ $TXTCD == 1 ]]; then
+                        echo -n "Choose a name for text effects folder: "
+                        read TXTCD
+                fi
+                if [[ $STD_FUNC != 0 || $TXTCD != 0 ]]; then
+                        echo -n "Do you want to put more folders? [Y/n] "
+                        read ANSWER
+                else
+                        ANSWER=y
+                fi
+                if [[ $ANSWER != "n" && $ANSWER != "N" ]]; then
+                        for ((; ;)); do
+                                echo -n "Which folder do you want to insert? "
+                                read STR
+                                putFolder
+                                echo -e "\n# <+-'-.-'-.-'-.-'-.-'-.-'-.-'-.-'-.-'-.-'-.-'-.-'-.-'-.-'-.-'-.-'-.-'-.-'-.-' #" >> Makefile
+                                echo -n "Do you want to put more folders? [Y/n] "
+                                read ANSWER
+                                if [[ $ANSWER == "n" || $ANSWER == "N" ]]; then
+                                        break
+                                fi
+                        done
+                fi
+        fi
+
+        initMake
+        return 0
 }
 
-makemod $1
-RET=$?
-exit $RET
